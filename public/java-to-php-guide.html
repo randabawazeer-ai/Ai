@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل الانتقال من Java إلى PHP - شرح مبسط</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif;
+  background: #0a0e17;
+  color: #cdd6f4;
+  line-height: 2;
+  font-size: 16px;
+}
+
+.container { max-width: 1000px; margin: 0 auto; padding: 25px; }
+
+/* ========== HEADER ========== */
+.hero {
+  text-align: center;
+  padding: 60px 0 40px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  border-radius: 20px;
+  margin-bottom: 30px;
+  border: 1px solid #334155;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(249,50,44,0.08) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, rgba(237,139,0,0.06) 0%, transparent 50%);
+  animation: pulse 8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.hero h1 {
+  font-size: 2.6em;
+  position: relative;
+  background: linear-gradient(135deg, #ed8b00 0%, #f9322c 50%, #ed8b00 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+.hero .subtitle {
+  font-size: 1.2em;
+  color: #94a3b8;
+  margin-top: 10px;
+  position: relative;
+}
+.hero .badges {
+  margin-top: 25px;
+  position: relative;
+}
+
+/* ========== BADGES ========== */
+.badge {
+  display: inline-block;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 600;
+  margin: 5px;
+}
+.b-java  { background: #ed8b0022; color: #fbbf24; border: 1px solid #ed8b0044; }
+.b-php   { background: #4f5b9311; color: #7879e8; border: 1px solid #7879e844; }
+.b-green { background: #16a34a22; color: #4ade80; border: 1px solid #16a34a44; }
+.b-red   { background: #dc262622; color: #f87171; border: 1px solid #dc262644; }
+.b-blue  { background: #2563eb22; color: #60a5fa; border: 1px solid #2563eb44; }
+.b-yellow{ background: #ca8a0422; color: #facc15; border: 1px solid #ca8a0444; }
+.b-purple{ background: #9333ea22; color: #c084fc; border: 1px solid #9333ea44; }
+
+/* ========== CARDS ========== */
+.card {
+  background: #111827;
+  border-radius: 16px;
+  padding: 30px;
+  margin: 25px 0;
+  border: 1px solid #1e293b;
+  transition: border-color 0.3s;
+}
+.card:hover { border-color: #334155; }
+.card h2 {
+  font-size: 1.7em;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.card h2 .icon { font-size: 1.3em; }
+.card h3 {
+  font-size: 1.25em;
+  margin: 25px 0 12px;
+  color: #94a3b8;
+}
+
+/* ========== CODE BLOCKS ========== */
+.code-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 15px 0;
+}
+.code-col {
+  background: #0d1117;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #30363d;
+}
+.code-col-title {
+  padding: 8px 16px;
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.code-col-title.java { background: #ed8b0033; color: #fbbf24; border-bottom: 1px solid #ed8b0044; }
+.code-col-title.php  { background: #7879e833; color: #7879e8; border-bottom: 1px solid #7879e844; }
+.code-col pre {
+  padding: 16px;
+  margin: 0;
+  overflow-x: auto;
+  direction: ltr;
+  text-align: left;
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.82em;
+  line-height: 1.7;
+}
+
+/* ========== SYNTAX HIGHLIGHTING ========== */
+.kw  { color: #ff7b72; font-weight: 600; } /* keyword */
+.fn  { color: #d2a8ff; } /* function */
+.str { color: #a5d6ff; } /* string */
+.cm  { color: #8b949e; font-style: italic; } /* comment */
+.var { color: #ffa657; } /* variable */
+.ty  { color: #79c0ff; } /* type/class */
+.attr{ color: #ffa657; } /* attribute */
+.reg { color: #f778ba; } /* regex */
+.num { color: #79c0ff; } /* number */
+.op  { color: #ff7b72; } /* operator */
+.tag { color: #7ee787; } /* html tag */
+
+/* ========== TABLES ========== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #1e293b;
+}
+th {
+  background: #1e293b;
+  padding: 12px 16px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95em;
+}
+td {
+  padding: 10px 16px;
+  text-align: center;
+  border-bottom: 1px solid #1e293b;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #1c2538; }
+td:first-child, th:first-child { text-align: right; }
+
+/* ========== BOXES ========== */
+.box-note {
+  background: #1e1b4b;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 15px 0;
+  border-right: 4px solid #818cf8;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.box-warn {
+  background: #451a03;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 15px 0;
+  border-right: 4px solid #f59e0b;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.box-tip {
+  background: #052e16;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 15px 0;
+  border-right: 4px solid #22c55e;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.box-icon { font-size: 1.4em; flex-shrink: 0; }
+
+/* ========== VS ARROW ========== */
+.vs-arrow {
+  text-align: center;
+  font-size: 1.5em;
+  color: #64748b;
+  margin: 8px 0;
+  font-weight: bold;
+}
+
+/* ========== INFO ROW ========== */
+.info-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 15px 0;
+}
+.info-box {
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  border: 1px solid #334155;
+}
+.info-box .num { font-size: 2em; font-weight: 800; color: #4facfe; }
+.info-box .lbl { font-size: 0.9em; color: #94a3b8; margin-top: 4px; }
+
+/* ========== FEATURE LIST ========== */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin: 15px 0;
+}
+.feature-item {
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 16px;
+  border-right: 3px solid #7879e8;
+  font-size: 0.95em;
+}
+
+/* ========== SINGLE CODE ========== */
+.code-single {
+  background: #0d1117;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px 0;
+  border: 1px solid #30363d;
+  overflow-x: auto;
+  direction: ltr;
+  text-align: left;
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.82em;
+  line-height: 1.7;
+}
+
+/* ========== NAV ========== */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 30px 0;
+}
+.nav a {
+  background: #1e293b;
+  color: #94a3b8;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  border: 1px solid #334155;
+  transition: all 0.2s;
+}
+.nav a:hover {
+  background: #334155;
+  color: #e2e8f0;
+  border-color: #4facfe;
+}
+
+/* ========== PROCESS STEPS ========== */
+.process {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+.process-step {
+  background: linear-gradient(135deg, #ed8b0033, #f9322c33);
+  border-radius: 12px;
+  padding: 12px 20px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9em;
+  border: 1px solid #ed8b0044;
+  min-width: 100px;
+}
+.process-arrow {
+  font-size: 1.5em;
+  color: #64748b;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .code-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.8em; }
+}
+
+/* ========== FLOATING TOOLTIP ========== */
+.tooltip {
+  position: relative;
+  cursor: help;
+  border-bottom: 1px dashed #4facfe;
+}
+.tooltip:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8em;
+  white-space: nowrap;
+  z-index: 10;
+  border: 1px solid #334155;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- ======================== HERO ======================== -->
+<div class="hero">
+  <h1>☕ Java &rarr; 🐘 PHP</h1>
+  <div class="subtitle">دليل الانتقال المبسط — كل ما تحتاجه للبدء الفوري</div>
+  <div class="badges">
+    <span class="badge b-java">Java 17+</span>
+    <span class="badge" style="color: #64748b; font-size: 1.5em;">&rarr;</span>
+    <span class="badge b-php">PHP 8.3</span>
+  </div>
+</div>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="#hello">&laquo;Hello World&raquo;</a>
+  <a href="#vars">المتغيرات</a>
+  <a href="#types">الأنواع</a>
+  <a href="#oop">OOP</a>
+  <a href="#arrays">المصفوفات</a>
+  <a href="#strings">النصوص</a>
+  <a href="#db">قاعدة البيانات</a>
+  <a href="#errors">الأخطاء</a>
+  <a href="#web">الويب</a>
+  <a href="#features">ميزات مميزة</a>
+  <a href="#cheatsheet">الخلاصة السريعة</a>
+</nav>
+
+<!-- ============================================================ -->
+<!-- HELLO WORLD -->
+<!-- ============================================================ -->
+<div class="card" id="hello">
+  <h2><span class="icon">▶</span> 1. Hello World — أول برنامج</h2>
+  <div class="code-grid">
+    <div class="code-col">
+      <div class="code-col-title java">☕ Java</div>
+      <pre><span class="cm">// Main.java</span>
+<span class="kw">public class</span> <span class="ty">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] <span class="var">args</span>) {
+        <span class="ty">System</span>.out.println(<span class="str">"Hello World"</span>);
+    }
+}</pre>
+    </div>
+    <div class="code-col">
+      <div class="code-col-title php">🐘 PHP</div>
+      <pre><span class="cm">// index.php</span>
+<span class="op">&lt;?php</span>
+
+<span class="kw">echo</span> <span class="str">"Hello World"</span>;</pre>
+    </div>
+  </div>
+
+  <div class="box-tip">
+    <span class="box-icon">💡</span>
+    <div>
+      <strong>لا Class ولا main():</strong> PHP تنفذ الكود مباشرة. لا تحتاج class أو static void main. فقط اكتب <span class="badge b-php">echo</span> ويشتغل!
+    </div>
+  </div>
+
+  <div class="box-note">
+    <span class="box-icon">📝</span>
+    <div>
+      <strong>ملاحظة:</strong> `&lt;?php ?>` هو وسم فتح وإغلاق كود PHP داخل HTML. إذا كان الملف PHP خالص لا تحتاج لإغلاق `?>`. الكود يشتغل بدون class وبدون main method.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VARIABLES -->
+<!-- ============================================================ -->
+<div class="card" id="vars">
+  <h2><span class="icon">💾</span> 2. المتغيرات — Variables</h2>
+
+  <h3>الإعلان والتعيين</h3>
+  <table>
+    <tr><th>العملية</th><th style="color:#fbbf24;">☕ Java</th><th style="color:#7879e8;">🐘 PHP</th></tr>
+    <tr>
+      <td>إعلان متغير</td>
+      <td><code>int x = 5;</code></td>
+      <td><code>$x = 5;</code></td>
+    </tr>
+    <tr>
+      <td>ثابت (Final)</td>
+      <td><code>final int X = 5;</code></td>
+      <td><code>const X = 5;</code> أو <code>define('X', 5);</code></td>
+    </tr>
+    <tr>
+      <td>نوع المتغير</td>
+      <td><code>String name = "Ali";</code></td>
+      <td><code>$name = "Ali";</code></td>
+    </tr>
+    <tr>
+      <td>تغيير القيمة</td>
+      <td><code>x = 10;</code></td>
+      <td><code>$x = 10;</code></td>
+    </tr>
+    <tr>
+      <td>Null safety</td>
+      <td><code>String? name = null;</code></td>
+      <td><code>$name = null;</code></td>
+    </tr>
+  </table>
+
+  <div class="box-tip">
+    <span class="box-icon">🤯</span>
+    <div>
+      <strong>الفرق الأكبر:</strong> كل متغير في PHP يبدأ بـ <code>$</code>. ولا يوجد أنواع إجبارية (PHP ديناميكية النوع): <code>$x = 5;</code> ثم <code>$x = "hello";</code> قانوني تمامًا. (لكن يفضل استخدام Type Hints في PHP 8)
+    </div>
+  </div>
+
+  <div class="box-note">
+    <span class="box-icon">🔤</span>
+    <div>
+      <strong>PHP 8 Type Hints (حديث):</strong> <code>int $x = 5;</code> — ممكن تحدد type مثل Java بالضبط مع strict_types.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DATA TYPES -->
+<!-- ============================================================ -->
+<div class="card" id="types">
+  <h2><span class="icon">🏷️</span> 3. أنواع البيانات — Data Types</h2>
+
+  <table>
+    <tr><th style="color:#fbbf24;">☕ Java</th><th style="color:#7879e8;">🐘 PHP</th><th>ملاحظة</th></tr>
+    <tr>
+      <td><code>int x = 10;</code></td>
+      <td><code>$x = 10;</code></td>
+      <td>عدد صحيح — نفس الشيء</td>
+    </tr>
+    <tr>
+      <td><code>double x = 3.14;</code></td>
+      <td><code>$x = 3.14;</code></td>
+      <td>عدد عشري — PHP يسميه float</td>
+    </tr>
+    <tr>
+      <td><code>boolean flag = true;</code></td>
+      <td><code>$flag = true;</code></td>
+      <td>قيم منطقية — متطابقة</td>
+    </tr>
+    <tr>
+      <td><code>String s = "hello";</code></td>
+      <td><code>$s = "hello";</code></td>
+      <td>نصوص — لا يوجد char في PHP</td>
+    </tr>
+    <tr>
+      <td><code>int[] arr = {1,2,3};</code></td>
+      <td><code>$arr = [1, 2, 3];</code></td>
+      <td>مصفوفة — أقواس مربعة</td>
+    </tr>
+    <tr>
+      <td><code>null</code></td>
+      <td><code>null</code></td>
+      <td>متطابقة</td>
+    </tr>
+    <tr>
+      <td><code>Object obj = new Foo();</code></td>
+      <td><code>$obj = new Foo();</code></td>
+      <td>كل شيء object</td>
+    </tr>
+  </table>
+
+  <div class="box-warn">
+    <span class="box-icon">⚠️</span>
+    <div>
+      <strong>PHP لا يوجد فيه:</strong> byte, short, long, float (بدقة), char. لكن يمكنك استخدام <code>int</code> لكل الأعداد الصحيحة و <code>float</code> لكل العشرية.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- OOP -->
+<!-- ============================================================ -->
+<div class="card" id="oop">
+  <h2><span class="icon">🏗️</span> 4. البرمجة الكائنية — OOP</h2>
+
+  <h3>4.1 كتابة Class (صنف)</h3>
+  <div class="code-grid">
+    <div class="code-col">
+      <div class="code-col-title java">☕ Java</div>
+      <pre><span class="kw">public class</span> <span class="ty">Car</span> {
+    <span class="kw">private</span> <span class="ty">String</span> <span class="var">brand</span>;
+    <span class="kw">private</span> <span class="ty">int</span> <span class="var">year</span>;
+
+    <span class="kw">public</span> <span class="fn">Car</span>(<span class="ty">String</span> <span class="var">brand</span>, <span class="ty">int</span> <span class="var">year</span>) {
+        <span class="kw">this</span>.<span class="var">brand</span> = <span class="var">brand</span>;
+        <span class="kw">this</span>.<span class="var">year</span> = <span class="var">year</span>;
+    }
+
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getBrand</span>() {
+        <span class="kw">return</span> <span class="var">brand</span>;
+    }
+}</pre>
+    </div>
+    <div class="code-col">
+      <div class="code-col-title php">🐘 PHP</div>
+      <pre><span class="kw">class</span> <span class="ty">Car</span> {
+    <span class="kw">private</span> <span class="ty">string</span> <span class="var">$brand</span>;
+    <span class="kw">private</span> <span class="ty">int</span> <span class="var">$year</span>;
+
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="ty">string</span> <span class="var">$brand</span>, <span class="ty">int</span> <span class="var">$year</span>) {
+        <span class="kw">$this</span>-><span class="var">brand</span> = <span class="var">$brand</span>;
+        <span class="kw">$this</span>-><span class="var">year</span>  = <span class="var">$year</span>;
+    }
+
+    <span class="kw">public function</span> <span class="fn">getBrand</span>(): <span class="ty">string</span> {
+        <span class="kw">return</span> <span class="kw">$this</span>-><span class="var">brand</span>;
+    }
+}</pre>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>المفهوم</th><th style="color:#fbbf24;">☕ Java</th><th style="color:#7879e8;">🐘 PHP</th></tr>
+    <tr><td>الـ Constructor</td><td><code>public Car() {}</code></td><td><code>public function __construct() {}</code></td></tr>
+    <tr><td>الوصول للـ this</td><td><code>this.brand</code></td><td><code>$this->brand</code></td></tr>
+    <tr><td>Public / Private</td><td><code>public int x;</code></td><td><code>public int $x;</code></td></tr>
+    <tr><td>Static</td><td><code>static int count;</code></td><td><code>static int $count;</code></td></tr>
+    <tr><td>استدعاء static</td><td><code>Car.count</code></td><td><code>Car::$count</code> أو <code>self::$count</code></td></tr>
+    <tr><td>new</td><td><code>new Car("BMW", 2024)</code></td><td><code>new Car("BMW", 2024)</code></td></tr>
+  </table>
+
+  <div class="box-tip">
+    <span class="box-icon">🔑</span>
+    <div>
+      <strong>الفرق الوحيد:</strong> Constructor اسمه <code>__construct</code> بدل اسم الكلاس. والوصول للـ this يحتاج <code>-></code> بدل <code>.</code>. وكل متغير في الكلاس يبدأ بـ <code>$</code>.
+    </div>
+  </div>
+
+  <h3>4.2 الوراثة (Inheritance)</h3>
+  <div class="code-grid">
+    <div class="code-col">
+      <div class="code-col-title java">☕ Java</div>
+      <pre><span class="kw">public class</span> <span class="ty">Dog</span> <span class="kw">extends</span> <span class="ty">Animal</span> {
+    <span class="attr">@Override</span>
+    <span class="kw">public void</span> <span class="fn">speak</span>() {
+        <span class="ty">System</span>.out.println(<span class="str">"Woof!"</span>);
+    }
+}</pre>
+    </div>
+    <div class="code-col">
+      <div class="code-col-title php">🐘 PHP</div>
+      <pre><span class="kw">class</span> <span class="ty">Dog</span> <span class="kw">extends</span> <span class="ty">Animal</span> {
+    <span class="kw">public function</span> <span class="fn">speak</span>(): <span class="ty">void</span> {
+        <span class="kw">echo</span> <span class="str">"Woof!"</span>;
+    }
+}</pre>
+    </div>
+  </div>
+
+  <h3>4.3 Interfaces</h3>
+  <div class="code-grid">
+    <div class="code-col">
+      <div class="code-col-title java">☕ Java</div>
+      <pre><span class="kw">public interface</span> <span class="ty">Payable</span> {
+    <span class="ty">double</span> <span class="fn">calculateTax</span>(<span class="ty">double</span> <span class="var">amount</span>);
+}
+
+<span class="kw">public class</span> <span class="ty">Invoice</span> <span class="kw">implements</span> <span class="ty">Payable</span> {
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">calculateTax</span>(<span class="ty">double</span> <span class="var">amount</span>) {
+        <span class="kw">return</span> <span class="var">amount</span> * <span class="num">0.15</span>;
+    }
+}</pre>
+    </div>
+    <div class="code-col">
+      <div class="code-col-title php">🐘 PHP</div>
+      <pre><span class="kw">interface</span> <span class="ty">Payable</span> {
+    <span class="kw">public function</span> <span class="fn">calculateTax</span>(<span class="ty">float</span> <span class="var">$amount</span>): <span class="ty">float</span>;
+}
+
+<span class="kw">class</span> <span class="ty">Invoice</span> <span class="kw">implements</span> <span class="ty">Payable</span> {
+    <span class="kw">public function</span> <span class="fn">calculateTax</span>(<span class="ty">float</span> <span class="var">$amount</span>): <span class="ty">float</span> {
+        <span class="kw">return</span> <span class="var">$amount</span> * <span class="num">0.15</span>;
+    }
+}</pre>
+    </div>
+  </div>
+
+  <h3>4.4 مقارنة سريعة لـ Modifiers</h3>
+  <table>
+    <tr><th>Java</th><th>PHP</th><th>المعنى</th></tr>
+    <tr><td><code>public</code></td><td><code>public</code></td><td>متاح للجميع</td></tr>
+    <tr><td><code>private</code></td><td><code>private</code></td><td>داخل الكلاس فقط</td></tr>
+    <tr><td><code>protected</code></td><td><code>protected</code></td><td>الكلاس + الأبناء</td></tr>
+    <tr><td><code>static</code></td><td><code>static</code></td><td>ينتمي للكلاس</td></tr>
+    <tr><td><code>final</code></td><td><code>final</code></td><td>لا يقبل الـ override</td></tr>
+    <tr><td><code>abstract</code></td><td><code>abstract</code></td><td>كلاس/ميثود غير مكتمل</td></tr>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- ARRAYS -->
+<!-- ============================================================ -->
+<div class="card" id="arrays">
+  <h2><span class="icon">📦</span> 5. المصفوفات — Arrays (أقوى ميزة في PHP!)</h2>
+
+  <div class="box-tip">
+    <span class="box-icon">🚀</span>
+    <div>
+      <strong>المصفوفة في PHP = ArrayList + HashMap + Stack معًا!</strong> المصفوفة في PHP هي الـ <span class="tooltip" data-tip="Swiss Army Knife">سكين الجيش السويسري</span> للبيانات — تقدر تستخدمها كـ List أو Map أو Stack أو Queue بدون تغيير!
+    </div>
+  </div>
+
+  <h3>5.1 إنشاء مصفوفة</h3>
+  <div class="code-grid">
+    <div class="code-col">
+      <div class="code-col-title java">☕ Java</div>
+      <pre><span class="cm">// Array (ثابت الحجم)</span>
+<span class="ty">int</span>[] <span class="var">nums</span> = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>};
+
+<span class="cm">// ArrayList (ديناميكي)</span>
+<span class="ty">ArrayList</span>&lt;<span class="ty">String</span>&gt; <span class="var">names</span> = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+<span class="var">names</span>.add(<span class="str">"Ali"</span>);
+
+<span class="cm">// HashMap</span>
+<span class="ty">HashMap</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; <span class="var">map</span> = <span class="kw">new</span> <span class="ty">HashMap</span>&lt;&gt;();
+<span class="var">map</span>.put(<span class="str">"Ali"</span>, <span class="num">25</span>);</pre>
+    </div>
+    <div class="code-col">
+      <div class="code-col-title php">🐘 PHP</div>
+      <pre><span class="cm">// مصفوفة عادية (List)</span>
+<span class="var">$nums</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>];
+
+<span class="cm">// إضافة عنصر</span>
+<span class="var">$nums</span>[] = <span class="num">4</span>;  <span class="cm">// الآن [1,2,3,4]</span>
+
+<span class="cm">// مصفوفة اسمية (Map / Dictionary)</span>
+<span class="var">$person</span> = [
+    <span class="str">'name'</span> => <span class="str">'Ali'</span>,
+    <span class="str">'age'</span>  => <span class="num">25</span>,
+];</pre>
+    </div>
+  </div>
+
+  <h3>5.2 العمليات الشائعة</h3>
+  <table>
+    <tr><th>العملية</th><th style="color:#fbbf24;">☕ Java</th><th style="color:#7879e8;">🐘 PHP</th></tr>
+    <tr>
+      <td>عدد العناصر</td>
+      <td><code>list.size()</code></td>
+      <td><code>count($arr)</code></td>
+    </tr>
+    <tr>
+      <td>حلقة (loop)</td>
+      <td><code>for (var x : list) {}</code></td>
+      <td><code>foreach ($arr as $x) {}</code></td>
+    </tr>
+    <tr>
+      <td>هل العنصر موجود</td>
+      <td><code>list.contains(x)</code></td>
+      <td><code>in_array($x, $arr)</code></td>
+    </tr>
+    <tr>
+      <td>فلترة</td>
+      <td><code>list.stream().filter(...)</code></td>
+      <td><code>array_filter($arr, fn($x) => $x > 0)</code></td>
+    </tr>
+    <tr>
+      <td>تحويل (map)</td>
+      <td><code>list.stream().map(...)</code></td>
+      <td><code>array_map(fn($x) => $x*2, $arr)</code></td>
+    </tr>
+    <tr>
+      <td>جمع (reduce)</td>
+      <td><code>list.stream().reduce(0, Integer::sum)</code></td>
+      <td><code>array_reduce($arr, fn($c, $x) => $c + $x, 0)</code></td>
+    </tr>
+    <tr>
+      <td>دمج مصفوفتين</td>
+      <td><code>list1.addAll(list2)</code></td>
+      <td><code>array_merge($arr1, $arr2)</code></td>
+    </tr>
+    <tr>
+      <td>فرز</td>
+      <td><code>Collections.sort(list)</code></td>
+      <td><code>sort($arr)</code></td>
+    </tr>
+  </table>
+
+  <div class="box-note">
+    <span class="box-icon">🗝️</span>
+    <div>
+      <strong>مفتاح PHP:</strong> الـ Array في PHP هي أقوى هيكل بيانات. بدل 10 كلاسات في Java (ArrayList, LinkedList, Stack, Queue, HashMap...) عندك structure واحد: <code>[]</code>. مرة تستخدمه كـ list ومرة كـ map.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STRINGS -->
+<!-- ============================================================ -->
+<div class="card" id="strings">
+  <h2><span class="icon">🔤</span> 6. النصوص — Strings</h2>
+
+  <table>
+    <tr><th>العملية</th><th style="color:#fbbf24;">☕ Java</th><th style="color:#7879e8;">🐘 PHP</th></tr>
+    <tr>
+      <td>دمج نصوص</td>
+      <td><code>s1 + s2</code></td>
+      <td><code>$s1 . $s2</code> (نقطة)</td>
+    </tr>
+    <tr>
+      <td>الطول</td>
+      <td><code>s.length()</code></td>
+      <td><code>strlen($s)</code></td>
+    </tr>
+    <tr>
+      <td>حرف في موقع</td>
+      <td><code>s.charAt(0)</code></td>
+      <td><code>$s[0]</code></td>
+    </tr>
+    <tr>
+      <td>قص جزء</td>
+      <td><code>s.substring(0, 3)</code></td>
+      <td><code>substr($s, 0, 3)</code></td>
+    </tr>
+    <tr>
+      <td>بحث عن نص</td>
+      <td><code>s.contains("x")</code></td>
+      <td><code>str_contains($s, 'x')</code></td>
+    </tr>
+    <tr>
+      <td>استبدال</td>
+      <td><code>s.replace("a","b")</code></td>
+      <td><code>str_replace('a','b',$s)</code></td>
+    </tr>
+    <tr>
+      <td>تقسيم إلى مصفوفة</td>
+      <td><code>s.split(",")</code></td>
+      <td><code>explode(',', $s)</code></td>
+    </tr>
+    <tr>
+      <td>دمج مصفوفة إلى نص</td>
+      <td><code>String.join(",", arr)</code></td>
+      <td><code>implode(',', $arr)</code></td>
+    </tr>
+    <tr>
+      <td>أحرف كبيرة</td>
+      <td><code>s.toUpperCase()</code></td>
+      <td><code>strtoupper($s)</code></td>
+    </tr>
+    <tr>
+      <td>أحرف صغيرة</td>
+      <td><code>s.toLowerCase()</code></td>
+      <td><code>strtolower($s)</code></td>
+    </tr>
+  </table>
+
+  <h3>أقوى ميزة: Interpolation (دمج المتغيرات داخل النص)</h3>
+  <div class="code-grid">
+    <div class="code-col">
+      <div class="code-col-title java">☕ Java</div>
+      <pre><span class="ty">String</span> <span class="var">name</span> = <span class="str">"Ali"</span>;
+<span class="ty">int</span> <span class="var">age</span> = <span class="num">25</span>;
+
+<span class="cm">// الطريقة المملة 😫</span>
+<span class="ty">String</span> <span class="var">msg</span> = <span class="str">"Name: "</span> + <span class="var">name</span> + <span class="str">", Age: "</span> + <span class="var">age</span>;
+
+<span class="cm">// أو String.format</span>
+<span class="ty">String</span> <span class="var">msg2</span> = <span class="ty">String</span>.format(
+    <span class="str">"Name: %s, Age: %d"</span>, <span class="var">name</span>, <span class="var">age</span>);</pre>
+    </div>
+    <div class="code-col">
+      <div class="code-col-title php">🐘 PHP</div>
+      <pre><span class="var">$name</span> = <span class="str">"Ali"</span>;
+<span class="var">$age</span> = <span class="num">25</span>;
+
+<span class="cm">// Direct interpolation 😍</span>
+<span class="var">$msg</span> = <span class="str">"Name: </span><span class="var">$name</span><span class="str">, Age: </span><span class="var">$age</span><span class="str">"</span>;
+
+<span class="cm">// مع قوسين للأمان</span>
+<span class="var">$msg2</span> = <span class="str">"Name: {</span><span class="var">$name</span><span class="str">}, Age: {</span><span class="var">$age</span><span class="str">}"</span>;</pre>
+    </div>
+  </div>
+
+  <div class="box-tip">
+    <span class="box-icon">✨</span>
+    <div>
+      <strong>الـ Interpolation:</strong> ضع المتغير داخل <code>""</code> (علامات اقتباس مزدوجة) وسيتم استبداله بقيمته تلقائيًا! شيء لا يوجد في Java.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DATABASE -->
+<!-- ============================================================ -->
+<div class="card" id="db">
+  <h2><span class="icon">🗄️</span> 7. قواعد البيانات — Database (PDO vs JDBC)</h2>
+
+  <h3>استعلام SQL</h3>
+  <div class="code-grid">
+    <div class="code-col">
+      <div class="code-col-title java">☕ Java (JDBC)</div>
+      <pre><span class="cm">// تحتاج Connection + Statement + ResultSet</span>
+<span class="kw">try</span> (<span class="ty">Connection</span> <span class="var">conn</span> = <span class="ty">DriverManager</span>
+        .<span class="fn">getConnection</span>(<span class="str">"jdbc:mysql://..."</span>);
+     <span class="ty">PreparedStatement</span> <span class="var">stmt</span> = <span class="var">conn</span>
+        .<span class="fn">prepareStatement</span>(<span class="str">"SELECT * FROM users WHERE id = ?"</span>)) {
+
+    <span class="var">stmt</span>.<span class="fn">setInt</span>(<span class="num">1</span>, <span class="num">5</span>);
+    <span class="ty">ResultSet</span> <span class="var">rs</span> = <span class="var">stmt</span>.<span class="fn">executeQuery</span>();
+
+    <span class="kw">while</span> (<span class="var">rs</span>.<span class="fn">next</span>()) {
+        <span class="ty">String</span> <span class="var">name</span> = <span class="var">rs</span>.<span class="fn">getString</span>(<span class="str">"name"</span>);
+        <span class="ty">System</span>.out.println(<span class="var">name</span>);
+    }
+} <span class="kw">catch</span> (<span class="ty">SQLException</span> <span class="var">e</span>) {
+    <span class="var">e</span>.<span class="fn">printStackTrace</span>();
+}</pre>
+    </div>
+    <div class="code-col">
+      <div class="code-col-title php">🐘 PHP (PDO)</div>
+      <pre><span class="cm">// PDO — جاهز ومختصر</span>
+<span class="var">$pdo</span> = <span class="kw">new</span> <span class="ty">PDO</span>(<span class="str">'mysql:host=localhost;dbname=app'</span>, <span class="str">'root'</span>, <span class="str">''</span>);
+
+<span class="var">$stmt</span> = <span class="var">$pdo</span>-><span class="fn">prepare</span>(<span class="str">'SELECT * FROM users WHERE id = ?'</span>);
+<span class="var">$stmt</span>-><span class="fn">execute</span>([<span class="num">5</span>]);
+
+<span class="var">$rows</span> = <span class="var">$stmt</span>-><span class="fn">fetchAll</span>();
+<span class="kw">foreach</span> (<span class="var">$rows</span> <span class="kw">as</span> <span class="var">$row</span>) {
+    <span class="kw">echo</span> <span class="var">$row</span>[<span class="str">'name'</span>];
+}</pre>
+    </div>
+  </div>
+
+  <h3>Laravel Eloquent (أبسط بمراحل!)</h3>
+  <div class="code-single">
+<span class="cm">// Laravel Eloquent — مثل Hibernate لكن أسهل</span>
+
+<span class="cm">// جلب كل المستخدمين</span>
+<span class="var">$users</span> = <span class="ty">User</span>::<span class="fn">all</span>();
+
+<span class="cm">// بحث بشرط</span>
+<span class="var">$user</span> = <span class="ty">User</span>::<span class="fn">where</span>(<span class="str">'email'</span>, <span class="str">'ali@email.com'</span>)-><span class="fn">first</span>();
+
+<span class="cm">// إدراج</span>
+<span class="ty">User</span>::<span class="fn">create</span>([<span class="str">'name'</span> => <span class="str">'Ali'</span>, <span class="str">'email'</span> => <span class="str">'ali@email.com'</span>]);
+
+<span class="cm">// تحديث</span>
+<span class="var">$user</span>-><span class="fn">update</span>([<span class="str">'name'</span> => <span class="str">'Ali Mohammed'</span>]);
+
+<span class="cm">// حذف</span>
+<span class="var">$user</span>-><span class="fn">delete</span>();
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ERROR HANDLING -->
+<!-- ============================================================ -->
+<div class="card" id="errors">
+  <h2><span class="icon">⚠️</span> 8. معالجة الأخطاء — Error Handling</h2>
+
+  <h3>Try / Catch</h3>
+  <div class="code-grid">
+    <div class="code-col">
+      <div class="code-col-title java">☕ Java</div>
+      <pre><span class="kw">try</span> {
+    <span class="kw">int</span> <span class="var">result</span> = <span class="num">10</span> / <span class="num">0</span>;
+} <span class="kw">catch</span> (<span class="ty">ArithmeticException</span> <span class="var">e</span>) {
+    <span class="ty">System</span>.out.println(<span class="var">e</span>.<span class="fn">getMessage</span>());
+} <span class="kw">finally</span> {
+    <span class="cm">// cleanup</span>
+}
+
+<span class="cm">// throw custom</span>
+<span class="kw">throw new</span> <span class="ty">RuntimeException</span>(<span class="str">"error!"</span>);</pre>
+    </div>
+    <div class="code-col">
+      <div class="code-col-title php">🐘 PHP</div>
+      <pre><span class="kw">try</span> {
+    <span class="var">$result</span> = <span class="num">10</span> / <span class="num">0</span>;  <span class="cm">// DivisionByZeroError</span>
+} <span class="kw">catch</span> (<span class="ty">DivisionByZeroError</span> <span class="var">$e</span>) {
+    <span class="kw">echo</span> <span class="var">$e</span>-><span class="fn">getMessage</span>();
+} <span class="kw">finally</span> {
+    <span class="cm">// cleanup</span>
+}
+
+<span class="cm">// throw custom</span>
+<span class="kw">throw new</span> <span class="ty">RuntimeException</span>(<span class="str">'error!'</span>);</pre>
+    </div>
+  </div>
+
+  <div class="box-note">
+    <span class="box-icon">✅</span>
+    <div><strong>نفس البنية بالضبط!</strong> try-catch-finally متطابقة. حتى <code>throw</code> نفس الشيء.</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- WEB BASICS -->
+<!-- ============================================================ -->
+<div class="card" id="web">
+  <h2><span class="icon">🌐</span> 9. الويب — PHP ملك الويب</h2>
+
+  <div class="box-tip">
+    <span class="box-icon">👑</span>
+    <div>
+      <strong>PHP صُممت للويب!</strong> على عكس Java اللي تحتاج Servlets أو Spring Boot لتتعامل مع HTTP، PHP تتعامل مع الويب بشكل طبيعي مباشر. اكتب HTML واحط فيه كود PHP.
+    </div>
+  </div>
+
+  <h3>9.1 صفحة ويب بسيطة — مزج HTML مع PHP</h3>
+  <div class="code-single">
+<span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;title&gt;</span>صفحة PHP<span class="tag">&lt;/title&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+
+    <span class="tag">&lt;h1&gt;</span>أهلاً بك<span class="tag">&lt;/h1&gt;</span>
+
+    <span class="op">&lt;?php</span>
+        <span class="var">$name</span> = <span class="str">"علي"</span>;
+        <span class="var">$time</span>  = <span class="fn">date</span>(<span class="str">'H:i'</span>);
+        <span class="kw">echo</span> <span class="str">"&lt;p&gt;مرحباً </span><span class="var">$name</span><span class="str">، الساعة الآن </span><span class="var">$time</span><span class="str">&lt;/p&gt;"</span>;
+    <span class="op">?&gt;</span>
+
+    <span class="tag">&lt;?php if</span> (<span class="var">$time</span> &lt; <span class="str">'12:00'</span>): <span class="tag">?&gt;</span>
+        <span class="tag">&lt;p&gt;</span>صباح الخير!<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;?php endif; ?&gt;</span>
+
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+  </div>
+
+  <h3>9.2 المتغيرات العالمية (Superglobals) — لا تحتاج @RequestParam!</h3>
+  <table>
+    <tr><th>PHP Superglobal</th><th>المحتوى</th><th>يقابله في Java (Spring)</th></tr>
+    <tr>
+      <td><code>$_GET['key']</code></td>
+      <td>معاملات الرابط (Query String)</td>
+      <td><code>@RequestParam</code></td>
+    </tr>
+    <tr>
+      <td><code>$_POST['key']</code></td>
+      <td>بيانات الـ Form (POST)</td>
+      <td><code>@RequestBody</code> / <code>request.getParameter()</code></td>
+    </tr>
+    <tr>
+      <td><code>$_SESSION['key']</code></td>
+      <td>بيانات الجلسة (Session)</td>
+      <td><code>HttpSession</code></td>
+    </tr>
+    <tr>
+      <td><code>$_COOKIE['key']</code></td>
+      <td>الكوكيز</td>
+      <td><code>Cookie</code></td>
+    </tr>
+    <tr>
+      <td><code>$_SERVER['key']</code></td>
+      <td>معلومات السيرفر والـ Headers</td>
+      <td><code>HttpServletRequest</code></td>
+    </tr>
+    <tr>
+      <td><code>$_FILES['file']</code></td>
+      <td>الملفات المرفوعة</td>
+      <td><code>MultipartFile</code></td>
+    </tr>
+    <tr>
+      <td><code>$_ENV['key']</code></td>
+      <td>متغيرات البيئة</td>
+      <td><code>System.getenv()</code></td>
+    </tr>
+  </table>
+
+  <div class="box-warn">
+    <span class="box-icon">🔒</span>
+    <div>
+      <strong>أمان:</strong> لا تستخدم <code>$_GET</code> أو <code>$_POST</code> مباشرة في استعلامات SQL! استخدم <strong>Prepared Statements</strong> دائماً. أو Eloquent في Laravel يتعامل مع هذا تلقائيًا.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- UNIQUE FEATURES -->
+<!-- ============================================================ -->
+<div class="card" id="features">
+  <h2><span class="icon">⭐</span> 10. ميزات PHP اللي راح تستعملها بكثرة وما موجودة في Java</h2>
+
+  <div class="feature-grid">
+
+    <div class="feature-item">
+      <span class="badge b-php">01</span>
+      <strong>Associative Arrays</strong>
+      <p style="margin-top:8px; color:#94a3b8;">مصفوفات بمفاتيح نصية = HashMap مدمج. <code>['name' => 'Ali']</code></p>
+    </div>
+
+    <div class="feature-item">
+      <span class="badge b-php">02</span>
+      <strong>String Interpolation</strong>
+      <p style="margin-top:8px; color:#94a3b8;">وضع المتغير مباشرة داخل النص <code>"Hello $name"</code></p>
+    </div>
+
+    <div class="feature-item">
+      <span class="badge b-php">03</span>
+      <strong>Superglobals</strong>
+      <p style="margin-top:8px; color:#94a3b8;">$_GET, $_POST, $_SESSION — متاحة من أي مكان</p>
+    </div>
+
+    <div class="feature-item">
+      <span class="badge b-php">04</span>
+      <strong>Traits</strong>
+      <p style="margin-top:8px; color:#94a3b8;">إعادة استخدام الكود بدون وراثة (بديل لـ Default Methods في Java interfaces)</p>
+    </div>
+
+    <div class="feature-item">
+      <span class="badge b-php">05</span>
+      <strong>Magic Methods</strong>
+      <p style="margin-top:8px; color:#94a3b8;">__construct, __toString, __get, __set, __call — تنفذ تلقائيًا في حالات معينة</p>
+    </div>
+
+    <div class="feature-item">
+      <span class="badge b-php">06</span>
+      <strong>Arrow Functions (PHP 7.4+)</strong>
+      <p style="margin-top:8px; color:#94a3b8;"><code>fn($x) => $x * 2</code> — مثل Java lambda تمامًا</p>
+    </div>
+
+    <div class="feature-item">
+      <span class="badge b-php">07</span>
+      <strong>Named Arguments (PHP 8)</strong>
+      <p style="margin-top:8px; color:#94a3b8;"><code>foo(name: 'Ali', age: 25)</code></p>
+    </div>
+
+    <div class="feature-item">
+      <span class="badge b-php">08</span>
+      <strong>Match Expression (PHP 8)</strong>
+      <p style="margin-top:8px; color:#94a3b8;">مثل switch لكن أفضل وأقصر وأنظف</p>
+    </div>
+
+    <div class="feature-item">
+      <span class="badge b-php">09</span>
+      <strong>Nullsafe Operator (PHP 8)</strong>
+      <p style="margin-top:8px; color:#94a3b8;"><code>$user?->getAddress()?->getCity()</code></p>
+    </div>
+
+    <div class="feature-item">
+      <span class="badge b-php">10</span>
+      <strong>libxml / mbstring</strong>
+      <p style="margin-top:8px; color:#94a3b8;">معالجة XML + دعم ممتاز للغة العربية والترميز UTF-8</p>
+    </div>
+
+  </div>
+
+  <h3>Traits — أقرب مثال لـ Default Interface Methods</h3>
+  <div class="code-grid">
+    <div class="code-col">
+      <div class="code-col-title java">☕ Java (Default Method)</div>
+      <pre><span class="kw">interface</span> <span class="ty">Loggable</span> {
+    <span class="kw">default void</span> <span class="fn">log</span>(<span class="ty">String</span> <span class="var">msg</span>) {
+        <span class="ty">System</span>.out.println(<span class="var">msg</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="ty">User</span> <span class="kw">implements</span> <span class="ty">Loggable</span> {
+    <span class="cm">// يستخدم log() تلقائياً</span>
+}</pre>
+    </div>
+    <div class="code-col">
+      <div class="code-col-title php">🐘 PHP (Trait)</div>
+      <pre><span class="kw">trait</span> <span class="ty">Loggable</span> {
+    <span class="kw">public function</span> <span class="fn">log</span>(<span class="ty">string</span> <span class="var">$msg</span>): <span class="ty">void</span> {
+        <span class="kw">echo</span> <span class="var">$msg</span>;
+    }
+}
+
+<span class="kw">class</span> <span class="ty">User</span> {
+    <span class="kw">use</span> <span class="ty">Loggable</span>; <span class="cm">// يستدعي الـ trait</span>
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- COMMON FUNCTIONS -->
+<!-- ============================================================ -->
+<div class="card" id="cheatsheet">
+  <h2><span class="icon">📋</span> 11. الخلاصة السريعة — Cheat Sheet</h2>
+
+  <h3>أكثر الدوال استخدامًا في PHP</h3>
+  <table>
+    <tr><th style="width:40%">PHP Function</th><th>ماذا يفعل</th><th style="color:#fbbf24;">يقابله في Java</th></tr>
+    <tr><td><code>echo</code></td><td>طباعة</td><td><code>System.out.println()</code></td></tr>
+    <tr><td><code>var_dump($x)</code></td><td>فحص متغير (debug)</td><td><code>System.out.println(x)</code></td></tr>
+    <tr><td><code>isset($x)</code></td><td>هل المتغير معرف وليس null</td><td><code>x != null</code> + وجود المتغير</td></tr>
+    <tr><td><code>empty($x)</code></td><td>هل المتغير فارغ/null/0/false</td><td>لا يوجد مقابل مباشر</td></tr>
+    <tr><td><code>count($arr)</code></td><td>عدد عناصر المصفوفة</td><td><code>arr.length / list.size()</code></td></tr>
+    <tr><td><code>in_array($x, $arr)</code></td><td>هل $x موجود في المصفوفة</td><td><code>list.contains(x)</code></td></tr>
+    <tr><td><code>array_key_exists($k, $arr)</code></td><td>هل المفتاح $k موجود</td><td><code>map.containsKey(k)</code></td></tr>
+    <tr><td><code>date('Y-m-d')</code></td><td>تاريخ اليوم</td><td><code>LocalDate.now()</code></td></tr>
+    <tr><td><code>time()</code></td><td>Unix timestamp</td><td><code>System.currentTimeMillis()/1000</code></td></tr>
+    <tr><td><code>json_encode($arr)</code></td><td>مصفوفة إلى JSON</td><td><code>new Gson().toJson()</code></td></tr>
+    <tr><td><code>json_decode($json, true)</code></td><td>JSON إلى مصفوفة</td><td><code>new Gson().fromJson()</code></td></tr>
+    <tr><td><code>header('Location: /')</code></td><td>توجيه (Redirect)</td><td><code>response.sendRedirect()</code></td></tr>
+    <tr><td><code>session_start()</code></td><td>بدء جلسة</td><td><code>request.getSession()</code></td></tr>
+    <tr><td><code>file_get_contents($path)</code></td><td>قراءة ملف كامل</td><td><code>Files.readString()</code></td></tr>
+    <tr><td><code>file_put_contents($path, $data)</code></td><td>كتابة ملف</td><td><code>Files.writeString()</code></td></tr>
+    <tr><td><code>include 'file.php'</code></td><td>تضمين ملف</td><td>لا يوجد — import فقط للكلاسات</td></tr>
+    <tr><td><code>require 'file.php'</code></td><td>تضمين إجباري (يُوقف إذا فشل)</td><td>لا يوجد</td></tr>
+  </table>
+
+  <h3>ملخص الفروقات الجوهرية بين Java و PHP</h3>
+
+  <div class="process">
+    <div class="process-step">كل متغير يبدأ بـ $</div>
+    <div class="process-arrow">→</div>
+    <div class="process-step">لا يوجد أنواع إجبارية (بشكل افتراضي)</div>
+    <div class="process-arrow">→</div>
+    <div class="process-step">$this->  بدل  this.</div>
+  </div>
+  <div class="process">
+    <div class="process-step">__construct بدل Car()</div>
+    <div class="process-arrow">→</div>
+    <div class="process-step">.  بدل  +  لدمج النصوص</div>
+    <div class="process-arrow">→</div>
+    <div class="process-step">[]  مصفوفة = List + Map</div>
+  </div>
+  <div class="process">
+    <div class="process-step">لا class للملف</div>
+    <div class="process-arrow">→</div>
+    <div class="process-step">كود مباشر</div>
+    <div class="process-arrow">→</div>
+    <div class="process-step">echo بدل println</div>
+  </div>
+
+  <div class="box-tip" style="margin-top:20px;">
+    <span class="box-icon">🎯</span>
+    <div>
+      <strong>الزبدة:</strong> 80% من مفاهيم Java تنطبق في PHP. OOP، Exceptions، Namespaces، كلها موجودة. الفرق الحقيقي في الـ Syntax (كل شي يبدأ بـ $) وفي التعامل مع الويب (Superglobals، مزج HTML مع الكود).
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FOOTER -->
+<!-- ============================================================ -->
+<div class="hero" style="padding: 40px 0; margin-top: 30px;">
+  <h1 style="font-size: 1.8em;">🚀 جاهز تبدأ رحلتك مع PHP؟</h1>
+  <div class="subtitle">Java + PHP = مبرمج Full-Stack متكامل</div>
+  <div style="margin-top: 20px; font-size: 0.9em; color: #64748b;">
+    الخطوة القادمة: نصب PHP + Composer على جهازك وابني أول مشروع Laravel
+  </div>
+</div>
+
+</div> <!-- /container -->
+
+</body>
+</html>
