@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل Git بالعربية</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<style>
+@font-face {
+  font-family: 'Mono';
+  src: local('Cascadia Code'), local('Fira Code'), local('JetBrains Mono'), local('Consolas');
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --ground: #0d1117;
+  --surface: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #f05133;
+  --green: #44a354;
+  --yellow: #d2991d;
+  --blue: #58a6ff;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif;
+  background: var(--ground);
+  color: var(--text);
+  line-height: 1.85;
+  font-size: 16px;
+}
+
+.page { max-width: 820px; margin:0 auto; padding:48px 24px 80px; }
+
+/* ---- Canvas DAG ---- */
+.dag-wrap {
+  margin: 0 0 48px 0;
+  overflow-x: auto;
+}
+.dag-wrap canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* ---- Headings ---- */
+h1 { font-size:2em; font-weight:700; margin-bottom:4px; text-wrap:balance; color:var(--text); }
+h1 .pipe { color:var(--accent); font-weight:400; margin:0 6px; }
+h2 { font-size:1.35em; font-weight:600; margin:48px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--border); color:var(--text); }
+h3 { font-size:1.1em; font-weight:600; margin:28px 0 8px; color:var(--text); }
+
+p  { max-width:62ch; color:var(--text); margin:12px 0; }
+
+/* ---- Tag / Pill ---- */
+.pill {
+  display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.8em; font-weight:600;
+  border:1px solid;
+  font-family: 'Mono', monospace;
+  direction:ltr;
+}
+.pill-add    { color:var(--green); border-color:var(--green); background:rgba(68,163,84,0.08); }
+.pill-cmd    { color:var(--accent); border-color:var(--accent); background:rgba(240,81,51,0.08); }
+.pill-branch { color:var(--blue); border-color:var(--blue); background:rgba(88,166,255,0.08); }
+.pill-warn   { color:var(--yellow); border-color:var(--yellow); background:rgba(210,153,29,0.08); }
+
+/* ---- Code blocks ---- */
+pre {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  overflow-x: auto;
+  margin: 16px 0;
+  direction: ltr;
+  text-align: left;
+  font-family: 'Mono', monospace;
+  font-size: 0.84em;
+  line-height: 1.7;
+  color: var(--text);
+}
+pre code { font-family:inherit; }
+
+/* ---- Tables ---- */
+.tbl {
+  width:100%; border-collapse:collapse; margin:16px 0;
+  border:1px solid var(--border); border-radius:8px; overflow:hidden;
+}
+.tbl th { background:var(--surface); padding:10px 14px; text-align:right; font-weight:600; border-bottom:1px solid var(--border); color:var(--muted);
+  font-variant-numeric:tabular-nums; }
+.tbl td { padding:10px 14px; border-bottom:1px solid var(--border); font-variant-numeric:tabular-nums; }
+.tbl tr:last-child td { border-bottom:none; }
+.tbl tr:hover td { background:var(--surface); }
+.tbl .cmd { font-family:'Mono',monospace; direction:ltr; text-align:left; color:var(--accent); }
+
+/* ---- Flow viz ---- */
+.flow-box {
+  display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:center;
+  margin:24px 0; font-family:'Mono',monospace; direction:ltr;
+}
+.flow-step {
+  background:var(--surface); border:1px solid var(--border); border-radius:8px;
+  padding:16px 20px; text-align:center; min-width:110px;
+}
+.flow-step .label { font-size:0.8em; color:var(--muted); margin-bottom:4px; }
+.flow-step .name  { font-size:1em; font-weight:600; }
+.flow-arrow { color:var(--green); font-size:1.2em; font-weight:700; }
+
+/* ---- Note box ---- */
+.note {
+  background:rgba(88,166,255,0.06); border:1px solid rgba(88,166,255,0.2); border-radius:8px;
+  padding:14px 20px; margin:16px 0; max-width:62ch;
+  border-right:3px solid var(--blue);
+}
+.note strong { color: var(--blue); }
+
+.warn {
+  background:rgba(210,153,29,0.06); border:1px solid rgba(210,153,29,0.2); border-radius:8px;
+  padding:14px 20px; margin:16px 0; max-width:62ch;
+  border-right:3px solid var(--yellow);
+}
+.warn strong { color: var(--yellow); }
+
+/* ---- Inline code ---- */
+:not(pre) > code {
+  font-family:'Mono',monospace; direction:ltr;
+  background:var(--surface); padding:1px 6px; border-radius:4px; font-size:0.9em;
+  color:var(--accent); border:1px solid var(--border);
+}
+
+/* ---- Footer ---- */
+.foot { margin-top:64px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:0.85em; text-align:center; }
+
+/* ---- Responsive ---- */
+@media (max-width:600px) {
+  .page { padding:24px 16px 48px; }
+  h1 { font-size:1.5em; }
+  .flow-box { flex-direction:column; }
+  .flow-arrow { transform:rotate(90deg); }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>git <span class="pipe">|</span> دليل عملي بالعربية</h1>
+<p style="color:var(--muted); margin-top:2px;">نظام تتبع التغييرات — كل ما تحتاجه للعمل على مشروعك</p>
+
+<!-- ===== Canvas DAG ===== -->
+<div class="dag-wrap">
+  <canvas id="dag" aria-label="رسم توضيحي لمسارات Git"></canvas>
+</div>
+
+<!-- ===== WHAT IS ===== -->
+<h2>ما هو Git؟</h2>
+<p>Git يسجل كل تعديل تسويه على ملفات مشروعك. تقدر ترجع لأي نسخة سابقة، تشتغل على أكتر من ميزة بنفس الوقت، وتشارك شغلك مع فريقك بدون ما تطيحون في بعض.</p>
+
+<div class="flow-box">
+  <div class="flow-step">
+    <div class="label">تكتب الكود</div>
+    <div class="name">edit</div>
+  </div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step">
+    <div class="label">تجهّز التغييرات</div>
+    <div class="name">add</div>
+  </div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step">
+    <div class="label">تحفظ نسخة</div>
+    <div class="name">commit</div>
+  </div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-step">
+    <div class="label">ترفع للسيرفر</div>
+    <div class="name">push</div>
+  </div>
+</div>
+
+<!-- ===== FIRST TIME ===== -->
+<h2>المرة الأولى — إعداد Git</h2>
+
+<pre><code class="language-bash">git config --global user.name "اسمك"
+git config --global user.email "بريدك@example.com"</code></pre>
+
+<p>هالإعداد يتسجل مرة وحدة فقط على جهازك. كل commit بعد كذا راح يكون موقع باسمك وبريدك.</p>
+
+<h3>بدء مشروع جديد أو ربط مشروع موجود</h3>
+
+<pre><code class="language-bash"># بدء مستودع جديد في مجلد المشروع
+git init
+
+# نسخ مشروع موجود من GitHub
+git clone https://github.com/username/repo.git</code></pre>
+
+<!-- ===== DAILY FLOW ===== -->
+<h2>الأوامر اليومية — دورة العمل</h2>
+
+<table class="tbl">
+  <tr>
+    <th style="width:20%">الحالة</th>
+    <th style="width:35%">الأمر</th>
+    <th>النتيجة</th>
+  </tr>
+  <tr>
+    <td>شوف وش تغير</td>
+    <td class="cmd">git status</td>
+    <td>يعرض الملفات المعدلة والجديدة والمحذوفة</td>
+  </tr>
+  <tr>
+    <td>جهّز ملف معين</td>
+    <td class="cmd">git add app.js</td>
+    <td>ينقل الملف لمرحلة التجهيز (staging)</td>
+  </tr>
+  <tr>
+    <td>جهّز كل الملفات</td>
+    <td class="cmd">git add .</td>
+    <td>يجمع كل التغييرات دفعة وحدة</td>
+  </tr>
+  <tr>
+    <td>احفظ التغييرات</td>
+    <td class="cmd">git commit -m "رسالة"</td>
+    <td>يحفظ نسخة (لقطة) من الملفات الحالية</td>
+  </tr>
+  <tr>
+    <td>ارفع للسيرفر</td>
+    <td class="cmd">git push</td>
+    <td>يرسل التغييرات المحفوظة لـ GitHub</td>
+  </tr>
+  <tr>
+    <td>نزّل تحديثات غيرك</td>
+    <td class="cmd">git pull</td>
+    <td>يجلب آخر التغييرات من السيرفر ويطبقها</td>
+  </tr>
+</table>
+
+<div class="note">
+  <strong>تلميح:</strong> فكر في <code>git add</code> كعربة تسوق — تحط فيها الملفات اللي تبغاها. <code>git commit</code> هو الدفع عند الكاشير — تسجل العملية. <code>git push</code> هو توصيل المشتريات للبيت — تنقلها للمكان النهائي (السيرفر).
+</div>
+
+<!-- ===== BRANCHES ===== -->
+<h2>الفروع <span class="pill pill-branch">Branches</span></h2>
+
+<p>الفرع هو نسخة منفصلة من المشروع تشتغل عليها بدون ما تأثر على النسخة الرئيسية. لما تخلص شغلك، تدمجها مع الرئيسية.</p>
+
+<h3>أوامر الفروع</h3>
+
+<pre><code class="language-bash"># عرض كل الفروع
+git branch
+
+# إنشاء فرع جديد
+git branch feature-login
+
+# الانتقال لفرع
+git checkout feature-login
+
+# اختصار: إنشاء + انتقال في خطوة وحدة
+git checkout -b feature-login
+
+# دمج الفرع الحالي مع main
+git checkout main
+git merge feature-login
+
+# حذف فرع (بعد دمجه)
+git branch -d feature-login</code></pre>
+
+<div class="warn">
+  <strong>انتبه:</strong> إذا غيرت الملفات وما حفظتها (<code>commit</code>)، بتنتقل معاك للفرع الجديد. احفظ شغلك أول أو استخدم <code>git stash</code>.
+</div>
+
+<!-- ===== UNDO ===== -->
+<h2>التراجع عن الأخطاء</h2>
+
+<table class="tbl">
+  <tr><th>الموقف</th><th class="cmd">الأمر</th></tr>
+  <tr><td>ترجّع ملف لآخر نسخة محفوظة</td><td class="cmd">git restore app.js</td></tr>
+  <tr><td>تلغي تجهيز ملف (قبل الـ commit)</td><td class="cmd">git restore --staged app.js</td></tr>
+  <tr><td>تعدّل آخر commit (رسالة أو ملفات)</td><td class="cmd">git commit --amend -m "رسالة جديدة"</td></tr>
+  <tr><td>ترجع لـ commit قديم (تحوّل مؤقت)</td><td class="cmd">git checkout abc1234</td></tr>
+  <tr><td>ترجع ملف معين من commit قديم</td><td class="cmd">git checkout abc1234 -- app.js</td></tr>
+  <tr><td>تخبي التغييرات الحالية (stash)</td><td class="cmd">git stash</td></tr>
+  <tr><td>ترجع التغييرات المخبأة</td><td class="cmd">git stash pop</td></tr>
+</table>
+
+<!-- ===== WORKFLOW ===== -->
+<h2>سير العمل العملي — مثال كامل</h2>
+
+<p>تبغى تضيف ميزة جديدة لمشروعك (مثلاً صفحة تقارير):</p>
+
+<pre><code class="language-bash"># 1. البداية — تأكد إنك على main ومحدث
+git checkout main
+git pull
+
+# 2. أنشئ فرع للميزة الجديدة
+git checkout -b feature-reports
+
+# 3. اشتغل على الكود... بعدين جهّز التغييرات
+git add .
+
+# 4. احفظ التغييرات
+git commit -m "إضافة صفحة التقارير والرسوم البيانية"
+
+# 5. ارجع لـ main وادمج
+git checkout main
+git pull
+git merge feature-reports
+
+# 6. ارفع التغييرات للسيرفر
+git push
+
+# 7. نظف — احذف الفرع (اختياري)
+git branch -d feature-reports</code></pre>
+
+<!-- ===== GITHUB ===== -->
+<h2>الربط مع GitHub</h2>
+
+<p>Git هو النظام المحلي (على جهازك). GitHub هو السيرفر السحابي اللي يخزّن نسخة من مشروعك ويخلّيك تشاركه مع غيرك.</p>
+
+<h3>ربط مشروع محلي مع GitHub</h3>
+
+<pre><code class="language-bash"># 1. أنشئ repo جديد في GitHub (من الموقع)
+# 2. اربطه مع مشروعك المحلي
+git remote add origin https://github.com/username/repo.git
+
+# 3. ارفع أول نسخة
+git push -u origin main</code></pre>
+
+<h3>ملف <code>.gitignore</code></h3>
+
+<p>هذا الملف يخبر Git أي ملفات أو مجلدات يتجاهلها ولا يتابعها:</p>
+
+<pre><code class="language-bash">node_modules/
+.env
+/vendor/
+*.log
+.DS_Store</code></pre>
+
+<!-- ===== COMMANDS SUMMARY ===== -->
+<h2>الخلاصة — ورقة الغش</h2>
+
+<table class="tbl">
+  <tr><th style="width:20%">المهمة</th><th class="cmd">الأمر</th></tr>
+  <tr><td>بدء مشروع</td><td class="cmd">git init</td></tr>
+  <tr><td>نسخ مشروع</td><td class="cmd">git clone &lt;url&gt;</td></tr>
+  <tr><td>شوف الحالة</td><td class="cmd">git status</td></tr>
+  <tr><td>جهّز الكل</td><td class="cmd">git add .</td></tr>
+  <tr><td>احفظ</td><td class="cmd">git commit -m "رسالة"</td></tr>
+  <tr><td>ارفع</td><td class="cmd">git push</td></tr>
+  <tr><td>نزّل</td><td class="cmd">git pull</td></tr>
+  <tr><td>فرع جديد</td><td class="cmd">git checkout -b &lt;اسم&gt;</td></tr>
+  <tr><td>بدّل فرع</td><td class="cmd">git checkout &lt;اسم&gt;</td></tr>
+  <tr><td>ادمج فرع</td><td class="cmd">git merge &lt;اسم&gt;</td></tr>
+  <tr><td>ترجّع ملف</td><td class="cmd">git restore &lt;ملف&gt;</td></tr>
+  <tr><td>خبّي التغييرات</td><td class="cmd">git stash</td></tr>
+  <tr><td>أظهر السجل</td><td class="cmd">git log --oneline</td></tr>
+  <tr><td>شوف الفروقات</td><td class="cmd">git diff</td></tr>
+</table>
+
+<div class="foot">
+  دليل Git بالعربية &mdash; مبني لمشروع AI Expense Tracker
+</div>
+
+</div><!-- /page -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script>
+hljs.highlightAll();
+
+// Canvas DAG — commit graph visualization
+(function(){
+  var c = document.getElementById('dag');
+  var ctx = c.getContext('2d');
+  var W = c.parentElement.clientWidth;
+  var dpr = window.devicePixelRatio || 1;
+  c.width = W * dpr; c.height = 180 * dpr; c.style.height = '180px';
+  ctx.scale(dpr,dpr);
+
+  var w = W, h = 180;
+  var branches = [
+    {x:0.25, color:'#58a6ff', nodes:[0.25,0.35,0.50,0.62,0.78,0.90]},
+    {x:0.52, color:'#44a354', nodes:[0.50,0.62]},
+    {x:0.75, color:'#f05133', nodes:[0.62,0.72,0.78]},
+  ];
+
+  // Line paths for each branch
+  branches.forEach(function(b){
+    ctx.beginPath();
+    ctx.strokeStyle = b.color;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    var x = w * b.x;
+    ctx.moveTo(x, h * b.nodes[0]);
+    for(var i=1; i<b.nodes.length; i++){
+      ctx.lineTo(x, h * b.nodes[i]);
+    }
+    ctx.stroke();
+  });
+
+  // Merge lines
+  ctx.beginPath(); ctx.strokeStyle='#8b949e'; ctx.lineWidth=1.5;
+  ctx.moveTo(w*0.52, h*0.62); ctx.lineTo(w*0.25, h*0.62); ctx.stroke();
+  ctx.beginPath(); ctx.strokeStyle='#8b949e'; ctx.lineWidth=1.5;
+  ctx.moveTo(w*0.75, h*0.78); ctx.lineTo(w*0.25, h*0.78); ctx.stroke();
+
+  // Nodes (circles)
+  branches.forEach(function(b){
+    b.nodes.forEach(function(ny){
+      ctx.beginPath();
+      ctx.fillStyle = b.color;
+      ctx.arc(w * b.x, h * ny, 5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  });
+
+  // Labels
+  ctx.font = '12px "Segoe UI", Tahoma, sans-serif';
+  ctx.fillStyle = '#58a6ff'; ctx.textAlign = 'center';
+  ctx.fillText('main', w * 0.25, h * 0.18);
+  ctx.fillStyle = '#44a354'; ctx.textAlign = 'center';
+  ctx.fillText('feature', w * 0.52, h * 0.43);
+  ctx.fillStyle = '#f05133'; ctx.textAlign = 'center';
+  ctx.fillText('fix', w * 0.75, h * 0.56);
+})();
+</script>
+</body>
+</html>
