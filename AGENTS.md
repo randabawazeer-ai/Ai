@@ -73,3 +73,6 @@
 - Inertia (larvel selte template)
 - TailwindCSS
 
+# design system
+read DESIGN.md file
+
