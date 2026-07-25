@@ -74,5 +74,170 @@
 - TailwindCSS
 
 # design system
+Mobile first
 read DESIGN.md file
 
+# Frontend pages
+
+## هيكل الصفحات (MVP الإصدار الأول)
+
+```
+resources/js/pages/
+├── Dashboard.svelte              # لوحة التحكم
+├── transactions/
+│   ├── Index.svelte              # قائمة المعاملات
+│   ├── Create.svelte             # إضافة معاملة جديدة
+│   └── Edit.svelte               # تعديل معاملة
+├── categories/
+│   └── Index.svelte              # إدارة التصنيفات
+├── auth/                         # صفحات المصادقة (موجودة مسبقاً)
+│   ├── Login.svelte
+│   ├── Register.svelte
+│   ├── ForgotPassword.svelte
+│   └── ...
+└── settings/                     # الإعدادات (موجودة مسبقاً)
+    ├── Profile.svelte
+    ├── Security.svelte
+    └── Appearance.svelte
+```
+
+## الشريط الجانبي (Navigation)
+
+| # | العنوان | الأيقونة | المسار |
+|---|---------|----------|--------|
+| 1 | لوحة التحكم | LayoutGrid | /dashboard |
+| 2 | المعاملات | ArrowRightLeft | /transactions |
+| 3 | التصنيفات | Tags | /categories |
+| 4 | الإعدادات | Settings | /settings/profile |
+
+## وصف الصفحات
+
+### 1. لوحة التحكم (Dashboard)
+- 4 بطاقات إحصائية: إجمالي المصاريف، إجمالي الإيرادات، الرصيد، عدد المعاملات
+- قائمة آخر 10 معاملات
+- زر سريع لإضافة معاملة جديدة
+- يعرض بيانات الشهر الحالي فقط
+- **Controller:** `DashboardController@__invoke`
+
+### 2. قائمة المعاملات (Transactions Index)
+- جدول بآخر المعاملات مع pagination
+- بحث نصي في الوصف
+- فلترة متقدمة: النوع (مصروف/إيراد)، التصنيف، طريقة الدفع
+- أزرار تعديل وحذف لكل معاملة
+- تأكيد قبل الحذف
+- عرض المبلغ، التصنيف، طريقة الدفع، التاريخ
+- **Controller:** `TransactionController@index`
+
+### 3. إضافة معاملة (Transactions Create)
+- نموذج إضافة معاملة جديدة
+- حقول: النوع، المبلغ، الوصف، التصنيف، طريقة الدفع، التاريخ، ملاحظات، صورة الفاتورة
+- تصفية التصنيفات حسب نوع المعاملة المختار
+- **Controller:** `TransactionController@create` + `TransactionController@store`
+
+### 4. تعديل معاملة (Transactions Edit)
+- نفس نموذج الإضافة مع بيانات محملة مسبقاً
+- إمكانية تغيير صورة الفاتورة
+- **Controller:** `TransactionController@edit` + `TransactionController@update`
+
+### 5. التصنيفات (Categories Index)
+- عرض التصنيفات الجاهزة (غير قابلة للتعديل/الحذف)
+- عرض التصنيفات المخصصة (قابلة للتعديل والحذف)
+- نافذة منبثقة (Dialog) لإضافة تصنيف جديد
+- نافذة منبثقة لتعديل التصنيف
+- حذف مع تأكيد
+- **Controller:** `CategoryController`
+
+## هياكل البيانات
+
+### Categories Table
+| الحقل | النوع | وصف |
+|-------|-------|-----|
+| id | bigint | المفتاح الرئيسي |
+| user_id | nullable FK | null للتصنيفات الجاهزة، user.id للمخصصة |
+| name | string | اسم التصنيف |
+| icon | string | اسم أيقونة Lucide |
+| type | enum | expense / income / both |
+| is_default | boolean | هل هو تصنيف جاهز |
+| timestamps | | |
+
+### Transactions Table
+| الحقل | النوع | وصف |
+|-------|-------|-----|
+| id | bigint | المفتاح الرئيسي |
+| user_id | FK | صاحب المعاملة |
+| category_id | nullable FK | التصنيف |
+| type | enum | expense / income |
+| amount | decimal(12,2) | المبلغ |
+| description | nullable string | الوصف |
+| payment_method | enum | cash / credit_card / digital_wallet / bank_transfer |
+| transaction_date | date | تاريخ المعاملة |
+| receipt_image_path | nullable string | مسار صورة الفاتورة |
+| notes | nullable text | ملاحظات |
+| timestamps | | |
+
+## التصنيفات الجاهزة (Seeder)
+
+| الاسم | النوع |
+|-------|-------|
+| طعام ومشروبات | expense |
+| مواصلات | expense |
+| سكن | expense |
+| فواتير ومرافق | expense |
+| ترفيه | expense |
+| تسوق | expense |
+| صحة | expense |
+| تعليم | expense |
+| راتب | income |
+| عمل حر | income |
+| استثمار | income |
+| هدايا | both |
+| أخرى | both |
+
+## المسارات (Routes)
+
+### web.php
+```
+GET  /                 → Welcome (صفحة الترحيب)
+GET  /dashboard        → DashboardController (لوحة التحكم)
+```
+
+### transactions.php (auth + verified)
+```
+GET    /transactions                      → index (القائمة)
+GET    /transactions/create               → create (نموذج الإضافة)
+POST   /transactions                      → store (حفظ)
+GET    /transactions/{transaction}/edit   → edit (نموذج التعديل)
+PATCH  /transactions/{transaction}        → update (تحديث)
+DELETE /transactions/{transaction}        → destroy (حذف)
+```
+
+### categories.php (auth + verified)
+```
+GET    /categories                 → index (القائمة)
+POST   /categories                 → store (إضافة تصنيف)
+PATCH  /categories/{category}      → update (تعديل تصنيف)
+DELETE /categories/{category}      → destroy (حذف تصنيف)
+```
+
+### settings.php (موجود مسبقاً)
+```
+GET    /settings/profile     → ProfileController@edit
+PATCH  /settings/profile     → ProfileController@update
+DELETE /settings/profile     → ProfileController@destroy
+GET    /settings/security    → SecurityController@edit
+PUT    /settings/password    → SecurityController@update
+GET    /settings/appearance  → Appearance settings
+```
+
+## ملاحظات تقنية
+
+- **التسمية:** اسم التطبيق "مدبّر" (Mudabbir)
+- **اللغة:** جميع النصوص بالعربية
+- **العملة:** ريال سعودي (ر.س)
+- **Svelte 5 Runes:** استخدام `$state`, `$derived`, `$props`
+- **Inertia.js:** استخدام `router`, `page`, `Link`, `Form`
+- **shadcn-svelte:** استخدام مكونات Select, Dialog, Button, Input, Card, Textarea
+- **lucide-svelte:** أيقونات للواجهة
+- **Tailwind CSS v4:** تنسيق الواجهة
+- **التصميم:** Mobile first
+- **RTL:** دعم اللغة العربية (يحتاج إعدادات Tailwind إضافية لاحقاً)

@@ -1,8 +1,9 @@
 <script lang="ts">
     import { Link } from '@inertiajs/svelte';
-    import BookOpen from 'lucide-svelte/icons/book-open';
-    import FolderGit2 from 'lucide-svelte/icons/folder-git-2';
     import LayoutGrid from 'lucide-svelte/icons/layout-grid';
+    import ArrowRightLeft from 'lucide-svelte/icons/arrow-right-left';
+    import Tags from 'lucide-svelte/icons/tags';
+    import Settings from 'lucide-svelte/icons/settings';
     import type { Snippet } from 'svelte';
     import AppLogo from '@/components/AppLogo.svelte';
     import NavFooter from '@/components/NavFooter.svelte';
@@ -19,6 +20,7 @@
     } from '@/components/ui/sidebar';
     import { toUrl } from '@/lib/utils';
     import { dashboard } from '@/routes';
+    import { edit } from '@/routes/profile';
     import type { NavItem } from '@/types';
 
     let {
@@ -29,22 +31,27 @@
 
     const mainNavItems: NavItem[] = [
         {
-            title: 'Dashboard',
+            title: 'لوحة التحكم',
             href: dashboard(),
             icon: LayoutGrid,
+        },
+        {
+            title: 'المعاملات',
+            href: '/transactions',
+            icon: ArrowRightLeft,
+        },
+        {
+            title: 'التصنيفات',
+            href: '/categories',
+            icon: Tags,
         },
     ];
 
     const footerNavItems: NavItem[] = [
         {
-            title: 'Repository',
-            href: 'https://github.com/laravel/svelte-starter-kit',
-            icon: FolderGit2,
-        },
-        {
-            title: 'Documentation',
-            href: 'https://laravel.com/docs/starter-kits#svelte',
-            icon: BookOpen,
+            title: 'الإعدادات',
+            href: edit(),
+            icon: Settings,
         },
     ];
 </script>
