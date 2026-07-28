@@ -1,26 +1,19 @@
 <script module lang="ts">
     export const layout = {
-        breadcrumbs: [
-            { title: 'التصنيفات', href: '/categories' },
-        ],
+        breadcrumbs: [{ title: 'التصنيفات', href: '/categories' }],
     };
 </script>
 
 <script lang="ts">
     import { page, router } from '@inertiajs/svelte';
+    import Pencil from 'lucide-svelte/icons/pencil';
+    import Plus from 'lucide-svelte/icons/plus';
+    import Tag from 'lucide-svelte/icons/tag';
+    import Trash2 from 'lucide-svelte/icons/trash-2';
     import AppHead from '@/components/AppHead.svelte';
-    import Heading from '@/components/Heading.svelte';
     import InputError from '@/components/InputError.svelte';
     import { Button } from '@/components/ui/button';
-    import { Input } from '@/components/ui/input';
-    import { Label } from '@/components/ui/label';
     import { Card, CardContent } from '@/components/ui/card';
-    import {
-        Select,
-        SelectContent,
-        SelectItem,
-        SelectTrigger,
-    } from '@/components/ui/select';
     import {
         Dialog,
         DialogContent,
@@ -28,32 +21,41 @@
         DialogTitle,
         DialogTrigger,
     } from '@/components/ui/dialog';
-    import Plus from 'lucide-svelte/icons/plus';
-    import Pencil from 'lucide-svelte/icons/pencil';
-    import Trash2 from 'lucide-svelte/icons/trash-2';
-    import Tag from 'lucide-svelte/icons/tag';
-    import TrendingDown from 'lucide-svelte/icons/trending-down';
-    import TrendingUp from 'lucide-svelte/icons/trending-up';
-    import Minus from 'lucide-svelte/icons/minus';
+    import { Input } from '@/components/ui/input';
+    import { Label } from '@/components/ui/label';
+    import {
+        Select,
+        SelectContent,
+        SelectItem,
+        SelectTrigger,
+    } from '@/components/ui/select';
 
-    const defaultCategories = $derived(page.props.defaultCategories as Array<{
-        id: number;
-        name: string;
-        icon: string;
-        type: string;
-    }> | null);
+    const defaultCategories = $derived(
+        page.props.defaultCategories as Array<{
+            id: number;
+            name: string;
+            icon: string;
+            type: string;
+        }> | null,
+    );
 
-    const customCategories = $derived(page.props.customCategories as Array<{
-        id: number;
-        name: string;
-        icon: string;
-        type: string;
-    }> | null);
+    const customCategories = $derived(
+        page.props.customCategories as Array<{
+            id: number;
+            name: string;
+            icon: string;
+            type: string;
+        }> | null,
+    );
 
     const errors = $derived(page.props.errors as Record<string, string>);
 
     let showAddDialog = $state(false);
-    let editingCategory = $state<{ id: number; name: string; type: string } | null>(null);
+    let editingCategory = $state<{
+        id: number;
+        name: string;
+        type: string;
+    } | null>(null);
 
     let newCategory = $state({ name: '', type: 'expense' });
     let editForm = $state({ name: '', type: 'expense' });
@@ -63,16 +65,20 @@
     function addCategory(e: SubmitEvent) {
         e.preventDefault();
         processing = true;
-        router.post('/categories', {
-            name: newCategory.name,
-            type: newCategory.type,
-        }, {
-            onFinish: () => {
-                processing = false;
-                showAddDialog = false;
-                newCategory = { name: '', type: 'expense' };
+        router.post(
+            '/categories',
+            {
+                name: newCategory.name,
+                type: newCategory.type,
             },
-        });
+            {
+                onFinish: () => {
+                    processing = false;
+                    showAddDialog = false;
+                    newCategory = { name: '', type: 'expense' };
+                },
+            },
+        );
     }
 
     function startEdit(cat: { id: number; name: string; type: string }) {
@@ -82,18 +88,26 @@
 
     function saveEdit(e: SubmitEvent) {
         e.preventDefault();
-        if (!editingCategory) return;
+
+        if (!editingCategory) {
+            return;
+        }
+
         processing = true;
-        router.post(`/categories/${editingCategory.id}`, {
-            _method: 'PATCH',
-            name: editForm.name,
-            type: editForm.type,
-        }, {
-            onFinish: () => {
-                processing = false;
-                editingCategory = null;
+        router.post(
+            `/categories/${editingCategory.id}`,
+            {
+                _method: 'PATCH',
+                name: editForm.name,
+                type: editForm.type,
             },
-        });
+            {
+                onFinish: () => {
+                    processing = false;
+                    editingCategory = null;
+                },
+            },
+        );
     }
 
     function deleteCategory(id: number) {
@@ -121,11 +135,13 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-bold tracking-tight">التصنيفات</h2>
-            <p class="text-muted-foreground">إدارة تصنيفات المصاريف والإيرادات</p>
+            <p class="text-muted-foreground">
+                إدارة تصنيفات المصاريف والإيرادات
+            </p>
         </div>
-        <Dialog open={showAddDialog} onOpenChange={(v) => showAddDialog = v}>
+        <Dialog open={showAddDialog} onOpenChange={(v) => (showAddDialog = v)}>
             <DialogTrigger asChild>
-                <Button onclick={() => showAddDialog = true}>
+                <Button onclick={() => (showAddDialog = true)}>
                     <Plus class="size-4" />
                     <span>إضافة تصنيف</span>
                 </Button>
@@ -150,15 +166,20 @@
                         <Label>نوع التصنيف</Label>
                         <Select
                             value={newCategory.type}
-                            onValueChange={(v) => newCategory.type = v}
+                            onValueChange={(v) => (newCategory.type = v)}
                         >
                             <SelectTrigger class="mt-2">
-                                <span>{typeLabels[newCategory.type] || 'اختر النوع'}</span>
+                                <span
+                                    >{typeLabels[newCategory.type] ||
+                                        'اختر النوع'}</span
+                                >
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="expense">مصروفات</SelectItem>
                                 <SelectItem value="income">إيرادات</SelectItem>
-                                <SelectItem value="both">مصروفات وإيرادات</SelectItem>
+                                <SelectItem value="both"
+                                    >مصروفات وإيرادات</SelectItem
+                                >
                             </SelectContent>
                         </Select>
                         <InputError message={errors.type} />
@@ -172,13 +193,15 @@
     <div>
         <h3 class="mb-4 text-lg font-semibold">التصنيفات الجاهزة</h3>
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {#each defaultCategories || [] as cat}
+            {#each defaultCategories || [] as cat (cat.id)}
                 <Card>
                     <CardContent class="flex items-center gap-3 p-4">
                         <Tag class="size-5 text-muted-foreground" />
                         <div class="flex-1 text-right">
                             <p class="font-medium">{cat.name}</p>
-                            <p class="text-xs text-muted-foreground">{typeLabel[cat.type]}</p>
+                            <p class="text-xs text-muted-foreground">
+                                {typeLabel[cat.type]}
+                            </p>
                         </div>
                         <div class="text-xs text-muted-foreground">افتراضي</div>
                     </CardContent>
@@ -191,18 +214,28 @@
         <h3 class="mb-4 text-lg font-semibold">تصنيفاتي المخصصة</h3>
         {#if customCategories?.length}
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {#each customCategories as cat}
+                {#each customCategories as cat (cat.id)}
                     <Card>
                         <CardContent class="flex items-center gap-3 p-4">
                             <Tag class="size-5 text-muted-foreground" />
                             <div class="flex-1 text-right">
                                 <p class="font-medium">{cat.name}</p>
-                                <p class="text-xs text-muted-foreground">{typeLabel[cat.type]}</p>
+                                <p class="text-xs text-muted-foreground">
+                                    {typeLabel[cat.type]}
+                                </p>
                             </div>
-                            <Button variant="ghost" size="icon" onclick={() => startEdit(cat)}>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onclick={() => startEdit(cat)}
+                            >
                                 <Pencil class="size-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onclick={() => deleteCategory(cat.id)}>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onclick={() => deleteCategory(cat.id)}
+                            >
                                 <Trash2 class="size-4 text-red-500" />
                             </Button>
                         </CardContent>
@@ -210,17 +243,28 @@
                 {/each}
             </div>
         {:else}
-            <div class="flex flex-col items-center justify-center rounded-xl border py-12 text-center">
+            <div
+                class="flex flex-col items-center justify-center rounded-xl border py-12 text-center"
+            >
                 <Tag class="size-12 text-muted-foreground/50" />
                 <p class="mt-4 text-muted-foreground">لا توجد تصنيفات مخصصة</p>
-                <p class="text-sm text-muted-foreground">أضف تصنيفاتك الخاصة من الزر أعلاه</p>
+                <p class="text-sm text-muted-foreground">
+                    أضف تصنيفاتك الخاصة من الزر أعلاه
+                </p>
             </div>
         {/if}
     </div>
 </div>
 
 {#if editingCategory}
-    <Dialog open={!!editingCategory} onOpenChange={(v) => { if (!v) editingCategory = null; }}>
+    <Dialog
+        open={!!editingCategory}
+        onOpenChange={(v) => {
+            if (!v) {
+                editingCategory = null;
+            }
+        }}
+    >
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>تعديل التصنيف</DialogTitle>
@@ -239,19 +283,26 @@
                     <Label>نوع التصنيف</Label>
                     <Select
                         value={editForm.type}
-                        onValueChange={(v) => editForm.type = v}
+                        onValueChange={(v) => (editForm.type = v)}
                     >
                         <SelectTrigger class="mt-2">
-                            <span>{typeLabels[editForm.type] || 'اختر النوع'}</span>
+                            <span
+                                >{typeLabels[editForm.type] ||
+                                    'اختر النوع'}</span
+                            >
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="expense">مصروفات</SelectItem>
                             <SelectItem value="income">إيرادات</SelectItem>
-                            <SelectItem value="both">مصروفات وإيرادات</SelectItem>
+                            <SelectItem value="both"
+                                >مصروفات وإيرادات</SelectItem
+                            >
                         </SelectContent>
                     </Select>
                 </div>
-                <Button type="submit" disabled={processing}>حفظ التعديلات</Button>
+                <Button type="submit" disabled={processing}
+                    >حفظ التعديلات</Button
+                >
             </form>
         </DialogContent>
     </Dialog>

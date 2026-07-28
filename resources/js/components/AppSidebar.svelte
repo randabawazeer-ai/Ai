@@ -1,9 +1,9 @@
 <script lang="ts">
     import { Link } from '@inertiajs/svelte';
-    import LayoutGrid from 'lucide-svelte/icons/layout-grid';
     import ArrowRightLeft from 'lucide-svelte/icons/arrow-right-left';
-    import Tags from 'lucide-svelte/icons/tags';
+    import LayoutGrid from 'lucide-svelte/icons/layout-grid';
     import Settings from 'lucide-svelte/icons/settings';
+    import Tags from 'lucide-svelte/icons/tags';
     import type { Snippet } from 'svelte';
     import AppLogo from '@/components/AppLogo.svelte';
     import NavFooter from '@/components/NavFooter.svelte';

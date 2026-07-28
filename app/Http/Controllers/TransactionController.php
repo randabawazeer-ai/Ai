@@ -32,7 +32,7 @@ class TransactionController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('description', 'like', '%' . $request->search . '%');
+            $query->where('description', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('date_from')) {
