@@ -38,7 +38,7 @@
     <DropdownMenuItem asChild>
         {#snippet children(props)}
             <Link
-                class={props.class}
+                class={props?.class}
                 href={toUrl(edit())}
                 prefetch
                 onclick={props.onClick}
@@ -53,7 +53,7 @@
 <DropdownMenuItem asChild>
     {#snippet children(props)}
         <Link
-            class={props.class}
+            class={props?.class}
             href={logout()}
             as="button"
             onclick={handleLogout(props.onClick)}

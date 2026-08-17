@@ -72,10 +72,13 @@
                 type: newCategory.type,
             },
             {
-                onFinish: () => {
+                onSuccess: () => {
                     processing = false;
                     showAddDialog = false;
                     newCategory = { name: '', type: 'expense' };
+                },
+                onError: () => {
+                    processing = false;
                 },
             },
         );
@@ -102,9 +105,12 @@
                 type: editForm.type,
             },
             {
-                onFinish: () => {
+                onSuccess: () => {
                     processing = false;
                     editingCategory = null;
+                },
+                onError: () => {
+                    processing = false;
                 },
             },
         );
@@ -122,11 +128,17 @@
         both: 'مصروفات وإيرادات',
     };
 
-    const typeLabels: Record<string, string> = {
-        expense: 'مصروفات',
-        income: 'إيرادات',
-        both: 'مصروفات وإيرادات',
-    };
+    function typeColor(type: string): string {
+        if (type === 'expense') {
+            return 'text-expense';
+        }
+
+        if (type === 'income') {
+            return 'text-income';
+        }
+
+        return 'text-primary';
+    }
 </script>
 
 <AppHead title="التصنيفات" />
@@ -170,7 +182,7 @@
                         >
                             <SelectTrigger class="mt-2">
                                 <span
-                                    >{typeLabels[newCategory.type] ||
+                                    >{typeLabel[newCategory.type] ||
                                         'اختر النوع'}</span
                                 >
                             </SelectTrigger>
@@ -196,12 +208,13 @@
             {#each defaultCategories || [] as cat (cat.id)}
                 <Card>
                     <CardContent class="flex items-center gap-3 p-4">
-                        <Tag class="size-5 text-muted-foreground" />
+                        <Tag class="size-5 {typeColor(cat.type)}" />
                         <div class="flex-1 text-right">
                             <p class="font-medium">{cat.name}</p>
-                            <p class="text-xs text-muted-foreground">
-                                {typeLabel[cat.type]}
-                            </p>
+                            <span
+                                class="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                                >{typeLabel[cat.type]}</span
+                            >
                         </div>
                         <div class="text-xs text-muted-foreground">افتراضي</div>
                     </CardContent>
@@ -217,12 +230,13 @@
                 {#each customCategories as cat (cat.id)}
                     <Card>
                         <CardContent class="flex items-center gap-3 p-4">
-                            <Tag class="size-5 text-muted-foreground" />
+                            <Tag class="size-5 {typeColor(cat.type)}" />
                             <div class="flex-1 text-right">
                                 <p class="font-medium">{cat.name}</p>
-                                <p class="text-xs text-muted-foreground">
-                                    {typeLabel[cat.type]}
-                                </p>
+                                <span
+                                    class="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                                    >{typeLabel[cat.type]}</span
+                                >
                             </div>
                             <Button
                                 variant="ghost"
@@ -236,7 +250,7 @@
                                 size="icon"
                                 onclick={() => deleteCategory(cat.id)}
                             >
-                                <Trash2 class="size-4 text-red-500" />
+                                <Trash2 class="size-4 text-destructive" />
                             </Button>
                         </CardContent>
                     </Card>
@@ -278,6 +292,7 @@
                         bind:value={editForm.name}
                         required
                     />
+                    <InputError message={errors.name} />
                 </div>
                 <div>
                     <Label>نوع التصنيف</Label>
@@ -287,7 +302,7 @@
                     >
                         <SelectTrigger class="mt-2">
                             <span
-                                >{typeLabels[editForm.type] ||
+                                >{typeLabel[editForm.type] ||
                                     'اختر النوع'}</span
                             >
                         </SelectTrigger>
@@ -299,6 +314,7 @@
                             >
                         </SelectContent>
                     </Select>
+                    <InputError message={errors.type} />
                 </div>
                 <Button type="submit" disabled={processing}
                     >حفظ التعديلات</Button

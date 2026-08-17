@@ -20,24 +20,26 @@
     const url = currentUrlState();
 </script>
 
-<SidebarGroup class="px-2 py-0">
-    <SidebarGroupLabel>القائمة الرئيسية</SidebarGroupLabel>
+<SidebarGroup class="px-3 py-2">
+    <SidebarGroupLabel class="mb-2 text-xs font-medium text-muted-foreground"
+        >القائمة</SidebarGroupLabel
+    >
     <SidebarMenu>
         {#each items as item (toUrl(item.href))}
             <SidebarMenuItem>
                 <SidebarMenuButton
-                    asChild
                     isActive={url.isCurrentUrl(item.href, url.currentUrl)}
                     tooltip={item.title}
+                    class="gap-3 rounded-lg text-sm font-normal text-muted-foreground hover:text-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary data-[active=true]:font-semibold data-[active=true]:shadow-sm h-10 flex-row items-center"
                 >
-                    {#snippet children(props)}
+                    {#snippet child({ props })}
                         <Link
                             {...props}
                             href={toUrl(item.href)}
-                            class={props.class}
+                            class={props?.class}
                         >
                             {#if item.icon}
-                                <item.icon class="size-4 shrink-0" />
+                                <item.icon class="size-5 shrink-0" />
                             {/if}
                             <span>{item.title}</span>
                         </Link>

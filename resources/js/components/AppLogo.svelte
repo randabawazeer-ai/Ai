@@ -2,11 +2,11 @@
     import AppLogoIcon from '@/components/AppLogoIcon.svelte';
 </script>
 
-<div
-    class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"
->
-    <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
-</div>
-<div class="ml-1 grid flex-1 text-left text-sm">
-    <span class="mb-0.5 truncate leading-tight font-semibold">مدبّر</span>
+<div class="flex items-center gap-3">
+    <div
+        class="flex aspect-square size-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white dark:text-white"
+    >
+        <AppLogoIcon class="size-6 fill-current text-white" />
+    </div>
+    <span class="text-base leading-tight font-bold">مدبّر</span>
 </div>

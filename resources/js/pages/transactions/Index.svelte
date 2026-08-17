@@ -8,6 +8,7 @@
     import { Link, page, router } from '@inertiajs/svelte';
     import ArrowDownRight from 'lucide-svelte/icons/arrow-down-right';
     import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right';
+    import Download from 'lucide-svelte/icons/download';
     import Filter from 'lucide-svelte/icons/filter';
     import Pencil from 'lucide-svelte/icons/pencil';
     import Plus from 'lucide-svelte/icons/plus';
@@ -145,12 +146,20 @@
             <h2 class="text-2xl font-bold tracking-tight">المعاملات</h2>
             <p class="text-muted-foreground">جميع مصاريفك وإيراداتك</p>
         </div>
-        <Button asChild>
-            <Link href={toUrl('/transactions/create')}>
-                <Plus class="size-4" />
-                <span>إضافة معاملة</span>
-            </Link>
-        </Button>
+        <div class="flex gap-2">
+            <Button variant="outline" size="sm" asChild>
+                <a href="/export/csv">
+                    <Download class="size-4" />
+                    <span>CSV</span>
+                </a>
+            </Button>
+            <Button asChild>
+                <Link href={toUrl('/transactions/create')}>
+                    <Plus class="size-4" />
+                    <span>إضافة معاملة</span>
+                </Link>
+            </Button>
+        </div>
     </div>
 
     <div class="flex items-center gap-2">
@@ -273,8 +282,8 @@
                     <div
                         class="flex size-10 items-center justify-center rounded-full {tx.type ===
                         'income'
-                            ? 'bg-green-100 text-green-600'
-                            : 'bg-red-100 text-red-600'}"
+                            ? 'bg-income/10 text-income'
+                            : 'bg-expense/10 text-expense'}"
                     >
                         {#if tx.type === 'income'}
                             <ArrowUpRight class="size-5" />
@@ -296,8 +305,8 @@
                     </div>
                     <div
                         class="font-semibold {tx.type === 'income'
-                            ? 'text-green-600'
-                            : 'text-red-600'}"
+                            ? 'text-income'
+                            : 'text-expense'}"
                         dir="ltr"
                     >
                         {tx.type === 'income'
@@ -315,7 +324,7 @@
                             size="icon"
                             onclick={() => deleteTransaction(tx.id)}
                         >
-                            <Trash2 class="size-4 text-red-500" />
+                            <Trash2 class="size-4 text-destructive" />
                         </Button>
                     </div>
                 </div>

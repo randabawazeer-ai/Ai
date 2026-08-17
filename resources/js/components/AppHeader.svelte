@@ -91,8 +91,8 @@
                                 variant="ghost"
                                 size="icon"
                                 class="mr-2 h-9 w-9"
-                                onclick={props.onclick}
-                                aria-expanded={props['aria-expanded']}
+                                onclick={props?.onclick}
+                                aria-expanded={props?.['aria-expanded']}
                             >
                                 <Menu class="h-5 w-5" />
                             </Button>
@@ -235,9 +235,9 @@
                                 variant="ghost"
                                 size="icon"
                                 class="relative size-10 w-auto rounded-full p-1 focus-within:ring-2 focus-within:ring-primary"
-                                onclick={props.onclick}
-                                aria-expanded={props['aria-expanded']}
-                                data-state={props['data-state']}
+                                onclick={props?.onclick}
+                                aria-expanded={props?.['aria-expanded']}
+                                data-state={props?.['data-state']}
                             >
                                 <Avatar
                                     class="size-8 overflow-hidden rounded-full"

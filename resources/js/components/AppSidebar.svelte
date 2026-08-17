@@ -1,7 +1,11 @@
 <script lang="ts">
     import { Link } from '@inertiajs/svelte';
     import ArrowRightLeft from 'lucide-svelte/icons/arrow-right-left';
+    import Bell from 'lucide-svelte/icons/bell';
+    import ChartNoAxesCombined from 'lucide-svelte/icons/chart-no-axes-combined';
     import LayoutGrid from 'lucide-svelte/icons/layout-grid';
+    import MessageCircle from 'lucide-svelte/icons/message-circle';
+    import Users from 'lucide-svelte/icons/users';
     import Settings from 'lucide-svelte/icons/settings';
     import Tags from 'lucide-svelte/icons/tags';
     import type { Snippet } from 'svelte';
@@ -41,6 +45,21 @@
             icon: ArrowRightLeft,
         },
         {
+            title: 'الميزانية',
+            href: '/budgets',
+            icon: ChartNoAxesCombined,
+        },
+        {
+            title: 'العائلة',
+            href: '/family',
+            icon: Users,
+        },
+        {
+            title: 'المساعد الذكي',
+            href: '/assistant',
+            icon: MessageCircle,
+        },
+        {
             title: 'التصنيفات',
             href: '/categories',
             icon: Tags,
@@ -49,6 +68,11 @@
 
     const footerNavItems: NavItem[] = [
         {
+            title: 'الإشعارات',
+            href: '/notifications',
+            icon: Bell,
+        },
+        {
             title: 'الإعدادات',
             href: edit(),
             icon: Settings,
@@ -56,16 +80,19 @@
     ];
 </script>
 
-<Sidebar collapsible="icon" variant="inset">
-    <SidebarHeader>
+<Sidebar collapsible="offcanvas" side="left">
+    <SidebarHeader class="gap-3 p-4">
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton size="lg" asChild>
-                    {#snippet children(props)}
+                <SidebarMenuButton
+                    size="lg"
+                    class="h-14 overflow-visible [&>span:last-child]:overflow-visible [&>span:last-child]:text-clip [&_svg]:size-6"
+                >
+                    {#snippet child({ props })}
                         <Link
                             {...props}
                             href={toUrl(dashboard())}
-                            class={props.class}
+                            class={props?.class}
                         >
                             <AppLogo />
                         </Link>
@@ -75,11 +102,11 @@
         </SidebarMenu>
     </SidebarHeader>
 
-    <SidebarContent>
+    <SidebarContent class="gap-2 px-2">
         <NavMain items={mainNavItems} />
     </SidebarContent>
 
-    <SidebarFooter>
+    <SidebarFooter class="gap-1 border-t border-sidebar-border p-2">
         <NavFooter items={footerNavItems} />
         <NavUser />
     </SidebarFooter>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Ai\Support\TransactionValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TransactionRequest extends FormRequest
@@ -9,13 +10,7 @@ class TransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'in:expense,income'],
-            'amount' => ['required', 'numeric', 'min:0.01', 'max:999999999.99'],
-            'description' => ['nullable', 'string', 'max:255'],
-            'category_id' => ['nullable', 'exists:categories,id'],
-            'payment_method' => ['required', 'in:cash,credit_card,digital_wallet,bank_transfer'],
-            'transaction_date' => ['required', 'date'],
-            'notes' => ['nullable', 'string', 'max:1000'],
+            ...TransactionValidationRules::rules(),
             'receipt_image' => ['nullable', 'image', 'max:5120'],
         ];
     }

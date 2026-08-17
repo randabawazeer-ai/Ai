@@ -33,7 +33,7 @@
 <AppHead title="Log in" />
 
 {#if status}
-    <div class="mb-4 text-center text-sm font-medium text-green-600">
+    <div class="mb-4 text-center text-sm font-medium text-income">
         {status}
     </div>
 {/if}

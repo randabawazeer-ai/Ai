@@ -116,10 +116,10 @@
                 <div class="mt-2 flex gap-2">
                     <Button
                         type="button"
-                        variant={form.type === 'expense'
-                            ? 'default'
-                            : 'outline'}
-                        class="flex-1"
+                        variant="outline"
+                        class="flex-1 {form.type === 'expense'
+                            ? 'border-expense/40 bg-expense/10 text-expense'
+                            : 'text-muted-foreground'}"
                         onclick={() => {
                             form.type = 'expense';
                             form.category_id = '';
@@ -129,8 +129,10 @@
                     </Button>
                     <Button
                         type="button"
-                        variant={form.type === 'income' ? 'default' : 'outline'}
-                        class="flex-1"
+                        variant="outline"
+                        class="flex-1 {form.type === 'income'
+                            ? 'border-income/40 bg-income/10 text-income'
+                            : 'text-muted-foreground'}"
                         onclick={() => {
                             form.type = 'income';
                             form.category_id = '';
